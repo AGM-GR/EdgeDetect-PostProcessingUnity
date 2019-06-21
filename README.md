@@ -30,3 +30,7 @@ Will render the Edge Detect effect before transparent objects are rendered, reco
 Will render the Edge Detect effect before the built-in Post Processing Stack effects, recommended for Scriptable Render Pipelines
 - `Add effect... > Unity Legacy > Edge Detection (After Stack)`
 Will render the Edge Detect effect after the built-in Post Processing Stack effects, if you want the edges to appear on top of everything
+
+===
+
+Thanks to [Jean Moreno](https://github.com/jean-moreno).
