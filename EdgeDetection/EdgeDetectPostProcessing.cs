@@ -24,6 +24,7 @@ public class EdgeDetectPostProcessing : PostProcessEffectSettings {
     public FloatParameter sensitivityNormals = new FloatParameter() { value = 1.0f };
     public FloatParameter lumThreshold = new FloatParameter() { value = 0.2f };
     public FloatParameter edgeExp = new FloatParameter() { value = 1.0f };
+    [Range(0f, 10f)]
     public FloatParameter sampleDist = new FloatParameter() { value = 1.0f };
     [Range(0f, 1f)]
     public FloatParameter edgesOnly = new FloatParameter() { value = 0.0f };

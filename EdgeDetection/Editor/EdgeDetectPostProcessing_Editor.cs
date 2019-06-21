@@ -19,7 +19,7 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
     GUIContent gc_sensitivityNormals = new GUIContent(" Normals Sensitivity");
     GUIContent gc_lumThreshold = new GUIContent(" Luminance Threshold");
     GUIContent gc_edgeExp = new GUIContent(" Edge Exponent");
-    GUIContent gc_sampleDist = new GUIContent(" Sample Distance");
+    GUIContent gc_sampleDist = new GUIContent(" Edge Width");
     GUIContent gc_edgesOnly = new GUIContent(" Edges Only");
     GUIContent gc_edgesOnlyBgColor = new GUIContent(" Color");
     GUIContent gc_edgesColor = new GUIContent(" Color");
@@ -54,7 +54,6 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
             return;
         }
 
-        PropertyField(sampleDist, gc_sampleDist);
 
         if (mode.value.enumValueIndex < 2) {
             PropertyField(sensitivityDepth, gc_sensitivityDepth);
@@ -62,7 +61,6 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
         } else if (mode.value.enumValueIndex < 4) {
             PropertyField(edgeExp, gc_edgeExp);
         } else {
-            // lum based mode
             PropertyField(lumThreshold, gc_lumThreshold);
         }
 
@@ -75,6 +73,7 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
         EditorGUILayout.Space();
 
         GUILayout.Label(gc_edges);
+        PropertyField(sampleDist, gc_sampleDist);
         PropertyField(edgesColor, gc_edgesColor);
     }
 }
