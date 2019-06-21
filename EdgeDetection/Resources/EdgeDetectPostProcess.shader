@@ -4,8 +4,8 @@ Shader "Hidden/EdgeDetect"
 
 		#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
 
-		//Functions and macros from UnityCG, because we can't include it here (causes duplicates from StdLib)
-		//Copied from UnityCG.cginc v2017.1.0f3
+		// Functions and macros from UnityCG, because we can't include it here (causes duplicates from StdLib)
+		// Copied from UnityCG.cginc v2017.1.0f3
 
 		inline float DecodeFloatRG( float2 enc )
 		{
@@ -28,18 +28,18 @@ Shader "Hidden/EdgeDetect"
 
 		//--------------------------------------------------------------------------------------------------------------------------------
 
-		//Source image
+		// Source image
 		TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
 		float4 _MainTex_ST;
 		float4 _MainTex_TexelSize;
 
-		//Camera depth/normals
+		// Camera Depth/Normals
 		sampler2D _CameraDepthNormalsTexture;
 		half4 _CameraDepthNormalsTexture_ST;
 		sampler2D_float _CameraDepthTexture;
 		half4 _CameraDepthTexture_ST;
 
-		//Settings
+		// Settings
 		half4 _Sensitivity; 
 		half4 _BgColor;
 		half _BgFade;
@@ -75,20 +75,20 @@ Shader "Hidden/EdgeDetect"
 
 		inline half CheckSame (half2 centerNormal, float centerDepth, half4 theSample)
 		{
-			// difference in normals
+			// Difference in normals
 			// do not bother decoding normals - there's no need here
 			half2 diff = abs(centerNormal - theSample.xy) * _Sensitivity.y;
-			int isSameNormal = (diff.x + diff.y) * _Sensitivity.y < 0.1;
-			// difference in depth
+			half isSameNormal = 1 - step(0.1, (diff.x + diff.y) * _Sensitivity.y);
+			// Difference in depth
 			float sampleDepth = DecodeFloatRG (theSample.zw);
 			float zdiff = abs(centerDepth-sampleDepth);
-			// scale the required threshold by the distance
-			int isSameDepth = zdiff * _Sensitivity.x < 0.09 * centerDepth;
+			// Scale the required threshold by the distance
+			half isSameDepth = 1 - step(0.09 * centerDepth, zdiff * _Sensitivity.x);
 			
 			// return:
 			// 1 - if normals and depth are similar enough
 			// 0 - otherwise
-			return isSameNormal * isSameDepth ? 1.0 : 0.0;
+			return (isSameNormal * isSameDepth);
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ Shader "Hidden/EdgeDetect"
 			o.texcoordStereo = TransformStereoScreenSpaceTex(texcoord, 1.0);
 			o.texcoord[0] = UnityStereoScreenSpaceUVAdjust(texcoord, _MainTex_ST);
 			
-			// offsets for two additional samples
+			// Offsets for two additional samples
 			o.texcoord[1] = UnityStereoScreenSpaceUVAdjust(texcoord + float2(-_MainTex_TexelSize.x, -_MainTex_TexelSize.y) * _SampleDistance, _MainTex_ST);
 			o.texcoord[2] = UnityStereoScreenSpaceUVAdjust(texcoord + float2(+_MainTex_TexelSize.x, -_MainTex_TexelSize.y) * _SampleDistance, _MainTex_ST);
 
@@ -163,9 +163,9 @@ Shader "Hidden/EdgeDetect"
 			half4 sample1 = tex2D(_CameraDepthNormalsTexture, i.texcoord[1]);
 			half4 sample2 = tex2D(_CameraDepthNormalsTexture, i.texcoord[2]);
 			
-			// encoded normal
+			// Encoded normal
 			half2 centerNormal = center.xy;
-			// decoded depth
+			// Decoded depth
 			float centerDepth = DecodeFloatRG(center.zw);
 			
 			half edge = 1.0;
@@ -200,8 +200,6 @@ Shader "Hidden/EdgeDetect"
 		{
 			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[0]);
 
-			// inspired by borderlands implementation of popular "sobel filter"
-
 		#if defined(FRAGD_CHEAP)
 			float centerDepth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.texcoord[1]));
 		#else
@@ -224,7 +222,7 @@ Shader "Hidden/EdgeDetect"
 			depthsAxis.w = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, UnityStereoScreenSpaceUVAdjust(i.texcoord[1]-uvDist*float2(0,1), _CameraDepthTexture_ST))); // B
 
 		#if !defined(FRAGD_CHEAP)
-			// make it work nicely with depth based image effects such as depth of field:
+			// Make it work nicely with depth based image effects such as depth of field:
 			depthsDiag = (depthsDiag > centerDepth.xxxx) ? depthsDiag : centerDepth.xxxx;
 			depthsAxis = (depthsAxis > centerDepth.xxxx) ? depthsAxis : centerDepth.xxxx;
 		#endif
@@ -275,7 +273,7 @@ Shader "Hidden/EdgeDetect"
 		{
 			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[0]);
 
-			// a very simple cross gradient filter
+			// A very simple cross gradient filter
 			half3 p1 = color.rgb;
 			half3 p2 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[1]).rgb;
 			half3 p3 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[2]).rgb;
@@ -283,8 +281,6 @@ Shader "Hidden/EdgeDetect"
 			half3 diff = p1 * 2 - p2 - p3;
 			half len = dot(diff, diff);
 			len = step(len, _Threshold);
-			//if(len >= _Threshold)
-			//	color.rgb = 0;
 
 			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), len);
 			return color;

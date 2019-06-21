@@ -7,18 +7,23 @@ EdgeDetection
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 
 <br>
+
 ## Description
 
 Unity post-processing Edge Detection and Outline.
-This repository is a fork of [EdgeDetect-PostProcessingUnity](https://github.com/jean-moreno/EdgeDetect-PostProcessingUnity), that ports legacy Unity "Edge Detect Normals" image effect to Post Processing Stack **v2**, adding features and modifications.
+This repository is a fork of [EdgeDetect-PostProcessingUnity](https://github.com/jean-moreno/EdgeDetect-PostProcessingUnity), that ports legacy Unity "Edge Detect Normals" image effect to **Post Processing Stack v2**, adding new features and modifications.
 
 - [Edge Detect Effect Normals - Unity Documentation](https://docs.unity3d.com/550/Documentation/Manual/script-EdgeDetectEffectNormals.html)
 - [Post Processing Stack v2 - Unity Technologies GitHub](https://github.com/Unity-Technologies/PostProcessing/tree/v2)
+
+<br><br>
 
 ## Installation
 
 This effect require [Post Processing Stack v2](https://github.com/Unity-Technologies/PostProcessing/tree/v2) added to your project. You can add it by Package Manager or Asset Store.
 Place the `EdgeDetection` folder anywhere in your project and it will be available in your PostProcessing Volume Profile.
+
+<br><br>
 
 ## Usage
 
@@ -31,6 +36,6 @@ Will render the Edge Detect effect before the built-in Post Processing Stack eff
 - `Add effect... > Unity Legacy > Edge Detection (After Stack)`
 Will render the Edge Detect effect after the built-in Post Processing Stack effects, if you want the edges to appear on top of everything
 
-===
+<br><br><br><br>
 
 Thanks to [Jean Moreno](https://github.com/jean-moreno).
