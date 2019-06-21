@@ -4,6 +4,10 @@
 // Legacy Image Effect: https://docs.unity3d.com/550/Documentation/Manual/script-EdgeDetectEffectNormals.html
 // Post Processing Stack v2: https://github.com/Unity-Technologies/PostProcessing/tree/v2
 //--------------------------------------------------------------------------------------------------------------------------------
+// Modified and expanded functionality
+// Contributors:
+//	- Alejandro Guerrero Martinez
+//--------------------------------------------------------------------------------------------------------------------------------
 
 using System;
 using UnityEngine;
@@ -41,6 +45,7 @@ public class EdgeDetectPostProcessing : PostProcessEffectSettings
 	[Range(0f,1f)]
 	public FloatParameter edgesOnly = new FloatParameter() { value = 0.0f };
 	public ColorParameter edgesOnlyBgColor = new ColorParameter() { value =  Color.white };
+    public ColorParameter edgesColor = new ColorParameter() { value = Color.black };
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------
@@ -60,10 +65,11 @@ public class EdgeDetectPostProcessingRenderer<T> : PostProcessEffectRenderer<T> 
 		sheet.properties.SetFloat("_BgFade", settings.edgesOnly);
 		sheet.properties.SetFloat("_SampleDistance", settings.sampleDist);
 		sheet.properties.SetVector("_BgColor", settings.edgesOnlyBgColor.value);
+        sheet.properties.SetVector("_EdgesColor", settings.edgesColor);
 		sheet.properties.SetFloat("_Exponent", settings.edgeExp);
 		sheet.properties.SetFloat("_Threshold", settings.lumThreshold);
 
-		context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, (int)settings.mode.value);
+        context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, (int)settings.mode.value);
 	}
 
 	public override DepthTextureMode GetCameraFlags()

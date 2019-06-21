@@ -4,6 +4,10 @@
 // Legacy Image Effect: https://docs.unity3d.com/550/Documentation/Manual/script-EdgeDetectEffectNormals.html
 // Post Processing Stack v2: https://github.com/Unity-Technologies/PostProcessing/tree/v2
 //--------------------------------------------------------------------------------------------------------------------------------
+// Modified and expanded functionality
+// Contributors:
+//	- Alejandro Guerrero Martinez
+//--------------------------------------------------------------------------------------------------------------------------------
 
 using UnityEngine;
 using UnityEditor;
@@ -20,6 +24,7 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
 	SerializedParameterOverride sampleDist;
 	SerializedParameterOverride edgesOnly;
 	SerializedParameterOverride edgesOnlyBgColor;
+    SerializedParameterOverride edgesColor;
 
 	GUIContent gc_mode = new GUIContent("Mode");
 	GUIContent gc_sensitivityDepth = new GUIContent(" Depth Sensitivity");
@@ -29,11 +34,13 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
 	GUIContent gc_sampleDist = new GUIContent(" Sample Distance");
 	GUIContent gc_edgesOnly = new GUIContent(" Edges Only");
 	GUIContent gc_edgesOnlyBgColor = new GUIContent(" Color");
+    GUIContent gc_edgesColor = new GUIContent(" Color");
 
-	string gc_description = "Detects spatial differences and converts into black outlines\n\nLegacy image effect from previous Unity versions ported to Post Processing v2";
+    string gc_description = "Detects spatial differences and converts into black outlines\n\nLegacy image effect from previous Unity versions ported to Post Processing v2";
 	GUIContent gc_background = new GUIContent("Background Options");
+    GUIContent gc_edges = new GUIContent("Edges Options");
 
-	public override void OnEnable()
+    public override void OnEnable()
 	{
 		mode = FindParameterOverride(x => x.mode);
 		sensitivityDepth = FindParameterOverride(x => x.sensitivityDepth);
@@ -43,7 +50,8 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
 		sampleDist = FindParameterOverride(x => x.sampleDist);
 		edgesOnly = FindParameterOverride(x => x.edgesOnly);
 		edgesOnlyBgColor = FindParameterOverride(x => x.edgesOnlyBgColor);
-	}
+        edgesColor = FindParameterOverride(x => x.edgesColor);
+    }
 
 	public override void OnInspectorGUI()
 	{
@@ -83,5 +91,10 @@ public class EdgeDetectPostProcessing_Editor<T> : PostProcessEffectEditor<T> whe
 		GUILayout.Label(gc_background);
 		PropertyField(edgesOnly, gc_edgesOnly);
 		PropertyField(edgesOnlyBgColor, gc_edgesOnlyBgColor);
-	}
+
+        EditorGUILayout.Space();
+
+        GUILayout.Label(gc_edges);
+        PropertyField(edgesColor, gc_edgesColor);
+    }
 }

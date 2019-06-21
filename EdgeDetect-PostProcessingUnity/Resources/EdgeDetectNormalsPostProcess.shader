@@ -4,6 +4,10 @@
 // Legacy Image Effect: https://docs.unity3d.com/550/Documentation/Manual/script-EdgeDetectEffectNormals.html
 // Post Processing Stack v2: https://github.com/Unity-Technologies/PostProcessing/tree/v2
 //--------------------------------------------------------------------------------------------------------------------------------
+// Modified and expanded functionality
+// Contributors:
+//	- Alejandro Guerrero Martinez
+//--------------------------------------------------------------------------------------------------------------------------------
 Shader "Hidden/EdgeDetect-PostProcess"
 {
 	HLSLINCLUDE
@@ -52,6 +56,7 @@ Shader "Hidden/EdgeDetect-PostProcess"
 		half _SampleDistance;
 		float _Exponent;
 		float _Threshold;
+		half4 _EdgesColor;
 
 		//--------------------------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +138,8 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			edge *= CheckSame(sample1.xy, DecodeFloatRG(sample1.zw), sample2);
 			edge *= CheckSame(sample3.xy, DecodeFloatRG(sample3.zw), sample4);
 
-			return edge * lerp(color, _BgColor, _BgFade);
+			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), edge);
+			return color;
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
@@ -176,7 +182,8 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			edge *= CheckSame(centerNormal, centerDepth, sample1);
 			edge *= CheckSame(centerNormal, centerDepth, sample2);
 			
-			return edge * lerp(color, _BgColor, _BgFade);
+			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), edge);
+			return color;
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
@@ -248,7 +255,8 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			float Sobel = sqrt(SobelX * SobelX + SobelY * SobelY);
 
 			Sobel = 1.0-pow(saturate(Sobel), _Exponent);
-			return Sobel * lerp(color, _BgColor, _BgFade);
+			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), Sobel);
+			return color;
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
@@ -288,7 +296,8 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			//if(len >= _Threshold)
 			//	color.rgb = 0;
 
-			return len * lerp(color, _BgColor, _BgFade);
+			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), len);
+			return color;
 		}
 
 	ENDHLSL
@@ -301,7 +310,7 @@ Shader "Hidden/EdgeDetect-PostProcess"
 		ZWrite Off
 		ZTest Always
 
-		Pass
+		Pass // 1 - Triangle Depth Normals
 		{
 			HLSLPROGRAM
 				#pragma vertex VertThin
@@ -309,15 +318,15 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			ENDHLSL
 		}
 
-		Pass
+		Pass // 2 - Roberts Cross Depth Normals
 		{
 			HLSLPROGRAM
 				#pragma vertex VertRobert
 				#pragma fragment FragRobert
 			ENDHLSL
 		}
-
-		Pass
+			
+		Pass // 3 - Sobel Depth
 		{
 			HLSLPROGRAM
 				#pragma multi_compile FRAGD_CHEAP
@@ -326,7 +335,7 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			ENDHLSL
 		}
 
-		Pass
+		Pass // 4 - Sobel Depth Thin
 		{
 			HLSLPROGRAM
 				#pragma vertex VertD
@@ -334,7 +343,7 @@ Shader "Hidden/EdgeDetect-PostProcess"
 			ENDHLSL
 		}
 
-		Pass
+		Pass // 5 - Triangle Luminance
 		{
 			HLSLPROGRAM
 				#pragma vertex VertLum
