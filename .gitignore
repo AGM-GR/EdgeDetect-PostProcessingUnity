@@ -1,5 +1,5 @@
-# Never ignore Assets meta data
-!/[Ee]dge[Dd]etection/**/*.meta
-
 # Ignore Repository meta data
 *.meta
+
+# Never ignore Assets meta data
+!/[Ee]dge[Dd]etection/**/*.meta
