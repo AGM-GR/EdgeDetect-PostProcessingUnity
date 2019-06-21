@@ -1,15 +1,24 @@
-# EdgeDetect-PostProcessingUnity
+EdgeDetection
+===
+[![](https://img.shields.io/github/release/AGM-GR/EdgeDetection.svg?label=latest%20version)](https://github.com/AGM-GR/EdgeDetection/releases)
+[![](https://img.shields.io/github/release-date/AGM-GR/EdgeDetection.svg)](https://github.com/AGM-GR/EdgeDetection/releases)
+![](https://img.shields.io/badge/unity-5.6.1%2B-green.svg)
+[![](https://img.shields.io/github/license/AGM-GR/EdgeDetection.svg)](https://github.com/AGM-GR/EdgeDetection/blob/master/LICENSE.txt)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](http://makeapullrequest.com)
 
-Port of the legacy Unity "Edge Detect Normals" image effect to Post Processing Stack **v2**
+<br>
+## Description
+
+Unity post-processing Edge Detection and Outline.
+This repository is a fork of [EdgeDetect-PostProcessingUnity](https://github.com/jean-moreno/EdgeDetect-PostProcessingUnity), that ports legacy Unity "Edge Detect Normals" image effect to Post Processing Stack **v2**, adding features and modifications.
 
 - [Edge Detect Effect Normals - Unity Documentation](https://docs.unity3d.com/550/Documentation/Manual/script-EdgeDetectEffectNormals.html)
 - [Post Processing Stack v2 - Unity Technologies GitHub](https://github.com/Unity-Technologies/PostProcessing/tree/v2)
 
-![Screenshot](https://i.imgur.com/8SH535F.gif)
-
 ## Installation
 
-Place the `EdgeDetect-PostProcessingUnity` folder anywhere in your project, and make sure that [Post Processing Stack v2](https://github.com/Unity-Technologies/PostProcessing/tree/v2) is in the project as well.
+This effect require [Post Processing Stack v2](https://github.com/Unity-Technologies/PostProcessing/tree/v2) added to your project. You can add it by Package Manager or Asset Store.
+Place the `EdgeDetection` folder anywhere in your project and it will be available in your PostProcessing Volume Profile.
 
 ## Usage
 
