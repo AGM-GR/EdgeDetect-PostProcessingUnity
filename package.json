@@ -1,6 +1,6 @@
 {
 	"name": "com.agm.edge-detection",
-	"displayName": "Post-Processing Edge Detection",
+	"displayName": "Edge Detection",
 	"description": "Edge Detect / Outliner for Unity Post-Processing Stack v2.",
 	"version": "1.0.0",
 	"unity": "2019.1",
@@ -9,7 +9,7 @@
 		"type": "git",
 		"url": "git+https://github.com/AGM-GR/EdgeDetection.git"
 	},
-  "src": "EdgeDetection",
+  "src": "EdgeDetection/",
   "upmSupport": true,
   "dependencies": {
     "com.unity.postprocessing": "2.1.6"
