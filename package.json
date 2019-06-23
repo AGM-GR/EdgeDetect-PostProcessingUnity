@@ -3,7 +3,7 @@
 	"displayName": "Edge Detection",
 	"description": "Edge Detect / Outliner for Unity Post-Processing Stack v2.",
 	"version": "1.0.0",
-	"unity": "2017.1",
+	"unity": "2019.1",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
