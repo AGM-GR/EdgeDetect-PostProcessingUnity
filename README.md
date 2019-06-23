@@ -39,6 +39,19 @@ This effect require [Post Processing Stack v2](https://github.com/Unity-Technolo
 
 **[Download](https://github.com/AGM-GR/EdgeDetection/releases)** lastest unity package version and add it to your proyect or clone/download this repository and place the `EdgeDetection` folder anywhere in your project and it will be available in your PostProcessing Volume Profile.
 
+##### Unity Package Manager - Install
+
+Also you can install it with Unity Package Manager (UPM). Find the "manifest.json" file in the "Packages" folder in your project root and edit it to add following line in dependencies section:
+
+```js
+{
+  "dependencies": {
+    "com.agm.edge-detection": "https://github.com/AGM-GR/EdgeDetection.git",
+    ...
+  }
+}
+```
+
 <br>
 
 ## Usage
