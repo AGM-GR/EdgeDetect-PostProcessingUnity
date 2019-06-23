@@ -46,11 +46,13 @@ Also you can install it with Unity Package Manager (UPM). Find the "manifest.jso
 ```js
 {
   "dependencies": {
-    "com.agm.edge-detection": "https://github.com/AGM-GR/EdgeDetection.git",
+    "com.agm.edge-detection": "https://github.com/AGM-GR/EdgeDetection.git#1.0.1",
     ...
   }
 }
 ```
+
+Change ```#x.x.x``` version number to update package.
 
 <br>
 
