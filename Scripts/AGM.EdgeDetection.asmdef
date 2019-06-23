@@ -1,0 +1,8 @@
+{
+    "name": "AGM.EdgeDetection",
+    "references": [
+        "Unity.Postprocessing.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

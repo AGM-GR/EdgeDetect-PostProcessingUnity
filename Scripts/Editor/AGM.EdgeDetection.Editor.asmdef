@@ -1,0 +1,13 @@
+{
+    "name": "AGM.EdgeDetection.Editor",
+    "references": [
+        "AGM.EdgeDetection",
+        "Unity.Postprocessing.Runtime",
+        "Unity.Postprocessing.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
