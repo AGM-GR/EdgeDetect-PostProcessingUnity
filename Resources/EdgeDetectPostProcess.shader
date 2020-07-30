@@ -2,7 +2,11 @@ Shader "Hidden/EdgeDetect"
 {
 	HLSLINCLUDE
 
+		#pragma multi_compile _ APPLY_FOG
+		#pragma multi_compile __ FOG_LINEAR FOG_EXP FOG_EXP2
+
 		#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/StdLib.hlsl"
+		#include "Packages/com.unity.postprocessing/PostProcessing/Shaders/Builtins/Fog.hlsl"
 
 		// Functions and macros from UnityCG, because we can't include it here (causes duplicates from StdLib)
 		// Copied from UnityCG.cginc v2017.1.0f3
@@ -57,6 +61,12 @@ Shader "Hidden/EdgeDetect"
 			float2 texcoordStereo : TEXCOORD5;
 		};
 
+		struct VaryingsThin {
+			float4 vertex : SV_POSITION;
+			float2 texcoord[3] : TEXCOORD0;
+			float2 texcoordStereo : TEXCOORD3;
+		};
+
 		struct VaryingsD
 		{
 			float4 vertex : SV_POSITION;
@@ -67,8 +77,8 @@ Shader "Hidden/EdgeDetect"
 		struct VaryingsLum
 		{
 			float4 vertex : SV_POSITION;
-			float2 texcoord[3] : TEXCOORD0;
-			float2 texcoordStereo : TEXCOORD3;
+			float2 texcoord[4] : TEXCOORD0;
+			float2 texcoordStereo : TEXCOORD4;
 		};
 
 		//--------------------------------------------------------------------------------------------------------------------------------
@@ -119,6 +129,7 @@ Shader "Hidden/EdgeDetect"
 		{
 			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[0]);
 
+			half4 center = tex2D(_CameraDepthNormalsTexture, i.texcoord[0].xy);
 			half4 sample1 = tex2D(_CameraDepthNormalsTexture, i.texcoord[1].xy);
 			half4 sample2 = tex2D(_CameraDepthNormalsTexture, i.texcoord[2].xy);
 			half4 sample3 = tex2D(_CameraDepthNormalsTexture, i.texcoord[3].xy);
@@ -128,15 +139,22 @@ Shader "Hidden/EdgeDetect"
 			edge *= CheckSame(sample1.xy, DecodeFloatRG(sample1.zw), sample2);
 			edge *= CheckSame(sample3.xy, DecodeFloatRG(sample3.zw), sample4);
 
-			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), edge);
+			half fog = 0.0;
+		#if (APPLY_FOG)
+			float d = DecodeFloatRG(center.zw);
+			d = ComputeFogDistance(d);
+			fog = 1.0 - ComputeFog(d);
+		#endif
+
+			color = lerp(lerp(_EdgesColor, _FogColor, fog), lerp(color, _BgColor, _BgFade), edge);
 			return color;
 		}
 
 		//--------------------------------------------------------------------------------------------------------------------------------
 
-		VaryingsLum VertThin(AttributesDefault v)
+		VaryingsThin VertThin(AttributesDefault v)
 		{
-			VaryingsLum o;
+			VaryingsThin o;
 
 			o.vertex = float4(v.vertex.xy, 0.0, 1.0);
 			float2 texcoord = TransformTriangleVertexToUV(v.vertex.xy);
@@ -155,7 +173,7 @@ Shader "Hidden/EdgeDetect"
 			return o;
 		}
 
-		float4 FragThin(VaryingsLum i) : SV_Target
+		float4 FragThin(VaryingsThin i) : SV_Target
 		{
 			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[0]);
 
@@ -172,7 +190,15 @@ Shader "Hidden/EdgeDetect"
 			edge *= CheckSame(centerNormal, centerDepth, sample1);
 			edge *= CheckSame(centerNormal, centerDepth, sample2);
 			
-			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), edge);
+			half fog = 0.0;
+		#if (APPLY_FOG)
+			float d = DecodeFloatRG(center.zw);
+			d = ComputeFogDistance(d);
+			fog = 1.0 - ComputeFog(d);
+		#endif
+
+			color = lerp(lerp(_EdgesColor, _FogColor, fog), lerp(color, _BgColor, _BgFade), edge);
+
 			return color;
 		}
 
@@ -242,8 +268,14 @@ Shader "Hidden/EdgeDetect"
 			float SobelY = dot(SobelV, float4(1,1,1,1));
 			float Sobel = sqrt(SobelX * SobelX + SobelY * SobelY);
 
+			half fog = 0.0;
+		#if (APPLY_FOG)
+			float d = ComputeFogDistance(centerDepth);
+			fog = 1.0 - ComputeFog(d);
+		#endif
+
 			Sobel = 1.0-pow(saturate(Sobel), _Exponent);
-			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), Sobel);
+			color = lerp(lerp(_EdgesColor, _FogColor, fog), lerp(color, _BgColor, _BgFade), Sobel);
 			return color;
 		}
 
@@ -265,6 +297,7 @@ Shader "Hidden/EdgeDetect"
 			o.texcoord[0] = UnityStereoScreenSpaceUVAdjust(texcoord, _MainTex_ST);
 			o.texcoord[1] = UnityStereoScreenSpaceUVAdjust(texcoord + float2(-_MainTex_TexelSize.x, -_MainTex_TexelSize.y) * _SampleDistance, _MainTex_ST);
 			o.texcoord[2] = UnityStereoScreenSpaceUVAdjust(texcoord + float2(+_MainTex_TexelSize.x, -_MainTex_TexelSize.y) * _SampleDistance, _MainTex_ST);
+			o.texcoord[3] = texcoord;
 
 			return o;
 		}
@@ -272,6 +305,12 @@ Shader "Hidden/EdgeDetect"
 		float4 FragLum(VaryingsLum i) : SV_Target
 		{
 			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord[0]);
+
+		#if defined(FRAGD_CHEAP)
+			float centerDepth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.texcoord[3]));
+		#else
+			float centerDepth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, UnityStereoScreenSpaceUVAdjust(i.texcoord[3], _CameraDepthTexture_ST)));
+		#endif
 
 			// A very simple cross gradient filter
 			half3 p1 = color.rgb;
@@ -282,7 +321,13 @@ Shader "Hidden/EdgeDetect"
 			half len = dot(diff, diff);
 			len = step(len, _Threshold);
 
-			color = lerp(_EdgesColor, lerp(color, _BgColor, _BgFade), len);
+			half fog = 0.0;
+		#if (APPLY_FOG)
+			float d = ComputeFogDistance(centerDepth);
+			fog = 1.0 - ComputeFog(d);
+		#endif
+
+			color = lerp(lerp(_EdgesColor, _FogColor, fog), lerp(color, _BgColor, _BgFade), len);
 			return color;
 		}
 

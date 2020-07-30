@@ -51,6 +51,17 @@ public class EdgeDetectPostProcessingRenderer<T> : PostProcessEffectRenderer<T> 
         sheet.properties.SetFloat("_Exponent", settings.edgeExp);
         sheet.properties.SetFloat("_Threshold", settings.lumThreshold);
 
+        // Set FOG params
+        if (RenderSettings.fog) {
+            sheet.EnableKeyword("APPLY_FOG");
+            var fogColor = RuntimeUtilities.isLinearColorSpace ? RenderSettings.fogColor.linear : RenderSettings.fogColor;
+            sheet.properties.SetVector("_FogColor", fogColor);
+            sheet.properties.SetVector("_FogParams", 
+                new Vector3(RenderSettings.fogDensity, RenderSettings.fogStartDistance, RenderSettings.fogEndDistance));
+        } else {
+            sheet.DisableKeyword("APPLY_FOG");
+        }
+
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, (int)settings.mode.value);
     }
 
@@ -58,11 +69,10 @@ public class EdgeDetectPostProcessingRenderer<T> : PostProcessEffectRenderer<T> 
         if (settings == null)
             return DepthTextureMode.None;
 
-        if (settings.mode == EdgeDetectMode.SobelDepth || settings.mode == EdgeDetectMode.SobelDepthThin)
-            return DepthTextureMode.Depth;
-        else if (settings.mode == EdgeDetectMode.TriangleDepthNormals || settings.mode == EdgeDetectMode.RobertsCrossDepthNormals)
+        if (settings.mode == EdgeDetectMode.TriangleDepthNormals || settings.mode == EdgeDetectMode.RobertsCrossDepthNormals)
             return DepthTextureMode.DepthNormals;
-
-        return base.GetCameraFlags();
+        else {
+            return DepthTextureMode.Depth;
+        }
     }
 }
