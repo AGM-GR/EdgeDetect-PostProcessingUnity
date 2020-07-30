@@ -30,6 +30,7 @@ Added features:
 |Feature|Screenshot|
 |-|-|
 |Edge Color Picker|<img src="https://user-images.githubusercontent.com/9071269/59956512-1a10fb00-9491-11e9-83ed-57e6dbc32e5d.gif" width="200px">|
+|Forward/Deferred Fog Support|<img src="https://user-images.githubusercontent.com/9071269/88866101-f4b0fd80-d209-11ea-9ed2-9d61de60c805.png" width="200px">|
 
 <br>
 
@@ -46,7 +47,7 @@ Also you can install it with Unity Package Manager (UPM). Find the "manifest.jso
 ```js
 {
   "dependencies": {
-    "com.agm.edge-detection": "https://github.com/AGM-GR/EdgeDetection.git#1.0.1",
+    "com.agm.edge-detection": "https://github.com/AGM-GR/EdgeDetection.git#1.1.0",
     ...
   }
 }
